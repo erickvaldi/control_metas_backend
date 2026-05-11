@@ -40,5 +40,9 @@ Authorization: erick-api-2026
 - 401: API Key incorrecta
 - 400: parámetros incorrectos al agregar o eliminar tareas o metas
 
+## Organización del proyecto
+Las rutas fueron segmentadas en módulos separados para tareas y metas, y el middleware de autorización se encuentra en un archivo independiente.
+
 ## Nota
 Los datos se almacenan en arreglos en memoria, por lo que no persisten al detener la aplicación.
+
