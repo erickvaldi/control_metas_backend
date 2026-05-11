@@ -3,35 +3,24 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 
-// Middleware para leer JSON
 app.use(express.json());
 
-// API Key creada por el estudiante
 const API_KEY = 'erick-api-2026';
 
-// Middleware de autorización
 const validateApiKey = (req, res, next) => {
   const authorization = req.header('Authorization');
 
-  if (!authorization) {
-    return res.status(401).json({
-      message: 'No se envió el header Authorization',
-    });
-  }
-
   if (authorization !== API_KEY) {
-    return res.status(403).json({
-      message: 'API Key no válida',
+    return res.status(401).json({
+      message: 'API Key incorrecta',
     });
   }
 
   next();
 };
 
-// Aplicar middleware a todas las rutas
 app.use(validateApiKey);
 
-// Arreglos en memoria
 let tasks = [
   {
     id: 1,
@@ -62,23 +51,23 @@ let goals = [
   },
 ];
 
-// GET /getTasks
+// Obtener tareas
 app.get('/getTasks', (req, res) => {
-  res.json(tasks);
+  return res.status(200).json(tasks);
 });
 
-// GET /getGoals
+// Obtener metas
 app.get('/getGoals', (req, res) => {
-  res.json(goals);
+  return res.status(200).json(goals);
 });
 
-// POST /addTask
+// Agregar tarea
 app.post('/addTask', (req, res) => {
   const { name, description, dueDate } = req.body;
 
   if (!name || !description || !dueDate) {
     return res.status(400).json({
-      message: 'Todos los campos son obligatorios: name, description, dueDate',
+      message: 'Parámetros incorrectos para agregar tarea',
     });
   }
 
@@ -91,19 +80,19 @@ app.post('/addTask', (req, res) => {
 
   tasks.push(newTask);
 
-  res.status(201).json({
+  return res.status(200).json({
     message: 'Tarea agregada correctamente',
     task: newTask,
   });
 });
 
-// POST /addGoal
+// Agregar meta
 app.post('/addGoal', (req, res) => {
   const { name, description, dueDate } = req.body;
 
   if (!name || !description || !dueDate) {
     return res.status(400).json({
-      message: 'Todos los campos son obligatorios: name, description, dueDate',
+      message: 'Parámetros incorrectos para agregar meta',
     });
   }
 
@@ -116,58 +105,58 @@ app.post('/addGoal', (req, res) => {
 
   goals.push(newGoal);
 
-  res.status(201).json({
+  return res.status(200).json({
     message: 'Meta agregada correctamente',
     goal: newGoal,
   });
 });
 
-// DELETE /removeTask
+// Eliminar tarea
 app.delete('/removeTask', (req, res) => {
   const { id } = req.body;
 
   if (!id) {
     return res.status(400).json({
-      message: 'Debes enviar el id de la tarea a eliminar',
+      message: 'Parámetros incorrectos para eliminar tarea',
     });
   }
 
   const taskExists = tasks.some((task) => task.id === Number(id));
 
   if (!taskExists) {
-    return res.status(404).json({
-      message: 'Tarea no encontrada',
+    return res.status(400).json({
+      message: 'La tarea que intenta eliminar no existe',
     });
   }
 
   tasks = tasks.filter((task) => task.id !== Number(id));
 
-  res.json({
+  return res.status(200).json({
     message: 'Tarea eliminada correctamente',
   });
 });
 
-// DELETE /removeGoal
+// Eliminar meta
 app.delete('/removeGoal', (req, res) => {
   const { id } = req.body;
 
   if (!id) {
     return res.status(400).json({
-      message: 'Debes enviar el id de la meta a eliminar',
+      message: 'Parámetros incorrectos para eliminar meta',
     });
   }
 
   const goalExists = goals.some((goal) => goal.id === Number(id));
 
   if (!goalExists) {
-    return res.status(404).json({
-      message: 'Meta no encontrada',
+    return res.status(400).json({
+      message: 'La meta que intenta eliminar no existe',
     });
   }
 
   goals = goals.filter((goal) => goal.id !== Number(id));
 
-  res.json({
+  return res.status(200).json({
     message: 'Meta eliminada correctamente',
   });
 });
