@@ -1,14 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const dataStore = require('../data/dataStore');
+const Goal = require('../models/goal');
 
 // Obtener metas
-router.get('/getGoals', (req, res) => {
-  return res.status(200).json(dataStore.goals);
+router.get('/getGoals', async (req, res) => {
+  try {
+    const goals = await Goal.find({});
+    return res.status(200).json(goals);
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al obtener metas',
+      error: error.message,
+    });
+  }
 });
 
 // Agregar meta
-router.post('/addGoal', (req, res) => {
+router.post('/addGoal', async (req, res) => {
   const { name, description, dueDate } = req.body;
 
   if (!name || !description || !dueDate) {
@@ -17,24 +25,30 @@ router.post('/addGoal', (req, res) => {
     });
   }
 
-  const newGoal = {
-    id: dataStore.goals.length > 0 ? dataStore.goals[dataStore.goals.length - 1].id + 1 : 1,
-    name,
-    description,
-    dueDate,
-  };
+  try {
+    const newGoal = new Goal({
+      name,
+      description,
+      dueDate,
+    });
 
-  dataStore.goals.push(newGoal);
+    const savedGoal = await newGoal.save();
 
-  return res.status(200).json({
-    message: 'Meta agregada correctamente',
-    goal: newGoal,
-  });
+    return res.status(200).json({
+      message: 'Meta agregada correctamente',
+      goal: savedGoal,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al guardar meta',
+      error: error.message,
+    });
+  }
 });
 
 // Eliminar meta
-router.delete('/removeGoal', (req, res) => {
-  const { id } = req.body;
+router.delete('/removeGoal/:id', async (req, res) => {
+  const { id } = req.params;
 
   if (!id) {
     return res.status(400).json({
@@ -42,19 +56,24 @@ router.delete('/removeGoal', (req, res) => {
     });
   }
 
-  const goalIndex = dataStore.goals.findIndex((goal) => goal.id === Number(id));
+  try {
+    const deletedGoal = await Goal.findByIdAndDelete(id);
 
-  if (goalIndex === -1) {
-    return res.status(400).json({
-      message: 'La meta que intenta eliminar no existe',
+    if (!deletedGoal) {
+      return res.status(400).json({
+        message: 'La meta que intenta eliminar no existe',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Meta eliminada correctamente',
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al eliminar meta',
+      error: error.message,
     });
   }
-
-  dataStore.goals.splice(goalIndex, 1);
-
-  return res.status(200).json({
-    message: 'Meta eliminada correctamente',
-  });
 });
 
 module.exports = router;

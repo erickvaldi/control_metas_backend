@@ -1,4 +1,6 @@
-const API_KEY = 'erick-api-2026';
+require('dotenv').config();
+
+const API_KEY = process.env.API_KEY;
 
 const validateApiKey = (req, res, next) => {
   const authorization = req.header('Authorization');

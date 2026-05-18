@@ -1,14 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const dataStore = require('../data/dataStore');
+const Task = require('../models/task');
 
 // Obtener tareas
-router.get('/getTasks', (req, res) => {
-  return res.status(200).json(dataStore.tasks);
+router.get('/getTasks', async (req, res) => {
+  try {
+    const tasks = await Task.find({});
+    return res.status(200).json(tasks);
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al obtener tareas',
+      error: error.message,
+    });
+  }
 });
 
 // Agregar tarea
-router.post('/addTask', (req, res) => {
+router.post('/addTask', async (req, res) => {
   const { name, description, dueDate } = req.body;
 
   if (!name || !description || !dueDate) {
@@ -17,24 +25,30 @@ router.post('/addTask', (req, res) => {
     });
   }
 
-  const newTask = {
-    id: dataStore.tasks.length > 0 ? dataStore.tasks[dataStore.tasks.length - 1].id + 1 : 1,
-    name,
-    description,
-    dueDate,
-  };
+  try {
+    const newTask = new Task({
+      name,
+      description,
+      dueDate,
+    });
 
-  dataStore.tasks.push(newTask);
+    const savedTask = await newTask.save();
 
-  return res.status(200).json({
-    message: 'Tarea agregada correctamente',
-    task: newTask,
-  });
+    return res.status(200).json({
+      message: 'Tarea agregada correctamente',
+      task: savedTask,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al guardar tarea',
+      error: error.message,
+    });
+  }
 });
 
 // Eliminar tarea
-router.delete('/removeTask', (req, res) => {
-  const { id } = req.body;
+router.delete('/removeTask/:id', async (req, res) => {
+  const { id } = req.params;
 
   if (!id) {
     return res.status(400).json({
@@ -42,19 +56,24 @@ router.delete('/removeTask', (req, res) => {
     });
   }
 
-  const taskIndex = dataStore.tasks.findIndex((task) => task.id === Number(id));
+  try {
+    const deletedTask = await Task.findByIdAndDelete(id);
 
-  if (taskIndex === -1) {
-    return res.status(400).json({
-      message: 'La tarea que intenta eliminar no existe',
+    if (!deletedTask) {
+      return res.status(400).json({
+        message: 'La tarea que intenta eliminar no existe',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Tarea eliminada correctamente',
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al eliminar tarea',
+      error: error.message,
     });
   }
-
-  dataStore.tasks.splice(taskIndex, 1);
-
-  return res.status(200).json({
-    message: 'Tarea eliminada correctamente',
-  });
 });
 
 module.exports = router;
