@@ -57,6 +57,20 @@ Ahora los endpoints realizan operaciones reales sobre la base de datos:
 ## Base de datos utilizada
 Se utilizó **MongoDB Atlas** como base de datos NoSQL para almacenar tareas y metas.
 
+
+# semana-6
+
+## Integración frontend + backend
+
+A partir de la Actividad Unidad VI, el proyecto fue integrado con el frontend desarrollado en React.
+
+Esta integración permite:
+
+- consumir los endpoints del backend desde el frontend
+- cargar tareas y metas desde MongoDB al iniciar la aplicación
+- agregar tareas y metas desde la interfaz
+- eliminar tareas y metas desde la interfaz
+
 ## Variables de entorno
 Para ejecutar correctamente el proyecto se debe crear un archivo `.env` en la raíz del backend con las siguientes variables:
 
@@ -64,3 +78,4 @@ Para ejecutar correctamente el proyecto se debe crear un archivo `.env` en la ra
 PORT=3000
 MONGO_URI=mongodb://ekvaldiviezo_db_user:Matrix@ac-dnlodes-shard-00-00.sufmzpt.mongodb.net:27017,ac-dnlodes-shard-00-01.sufmzpt.mongodb.net:27017,ac-dnlodes-shard-00-02.sufmzpt.mongodb.net:27017/control_metas?ssl=true&replicaSet=atlas-24y6kr-shard-0&authSource=admin&appName=Cluster0
 API_KEY=erick-api-2026
+
